@@ -1,0 +1,11 @@
+.price-lower {
+  color: red;
+}
+
+.price-greater {
+  color: green;
+}
+
+.price-same {
+  color: black;
+}
