@@ -9,7 +9,7 @@
     "dev": "webpack -w",
     "verify": "npm run lint && npm test",
     "build-min": "webpack -p",
-    "lint": "eslint src/**/*.js && eslint src/**/*.jsx && eslint specs/**/*.js && eslint models/**/*.js",
+    "lint": "eslint src/**/*.js && eslint src/**/*.jsx && eslint specs/**/*.js",
     "full-build": "npm install && npm run lint && npm test && npm build",
     "full-dev": "npm run lint && npm test && npm run dev"
   },
