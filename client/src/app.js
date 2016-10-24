@@ -1,10 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import BitcoinAppContainer from './components/BitcoinAppContainer.jsx';
+import AppContainer from './components/AppContainer.jsx';
 
 window.onload = function(){
   ReactDOM.render(
-    <BitcoinAppContainer />,
+    <AppContainer />,
     document.getElementById('app')
   );
 };

@@ -23,9 +23,18 @@ const BitcoinAppContainer = React.createClass({
     this.getData()
     setInterval(this.getData, 10000)
   },
-  getData: function () {
-    const promises = []
 
+  getData: function () {
+    if (!this.state.refreshing) return
+    this.getDataLocalStorage();
+    setTimeout(() => {
+      if (this.state.euroPrice == null || this.state.exchangeRates.length === 0) {
+        this.fetchData()
+      }
+    }, 0)
+  },
+  fetchData: function () {
+    const promises = []
     promises.push(new Promise((resolve, reject) => {
       const request = new XMLHttpRequest()
       request.open('GET', 'http://api.coindesk.com/v1/bpi/currentprice.json')
@@ -76,7 +85,6 @@ const BitcoinAppContainer = React.createClass({
     return true
     const colourChanged = this.state.priceChange != nextState.priceChange
     const priceChanged = this.state.price != nextState.price
-    console.log(colourChanged + "" + priceChanged)
     return colourChanged || priceChanged
   },
   getInitialState: function () {
