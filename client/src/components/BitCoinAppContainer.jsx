@@ -1,34 +1,23 @@
 import React from 'react'
 import ExchangeRates from './ExchangeRates.jsx'
 import {buildExchangeRateObject} from '../functions/dataFormatting.js'
-
-const calcPriceChange = function (oldPrice, newPrice) {
-  if (oldPrice == null) oldPrice = newPrice
-
-  const same = () => (oldPrice === newPrice)
-  const greater = () => (oldPrice < newPrice)
-  const lower = () => (oldPrice > newPrice)
-
-  const lookup = {
-    same, greater, lower
-  }
-  const keys = Object.keys(lookup)
-  for (let i = 0; i < keys.length; i++) {
-    const foundTrue = (lookup[ keys[i] ]() )
-    if (foundTrue) {
-      // console.log(keys[i])
-      return keys[i]
-    }
-  }
-}
+import {calcPriceChange} from '../functions/displayFormatting.js'
 
 const BitcoinAppContainer = React.createClass({
   render: function () {
     return (
       <div>
+      <label htmlFor='refreshing'>Refreshing data: </label>
+      <input id='refreshing' type='checkbox' defaultChecked={true} onChange={this.toggleRefreshData}/>
       <ExchangeRates priceChange={this.state.priceChange} btcPrices={buildExchangeRateObject(this.state.euroPrice, this.state.exchangeRates)}/>
       </div>
       )
+  },
+  toggleRefreshData: function (e) {
+    setTimeout(() => {
+      if (this.state.refreshing) this.getData()
+    }, 0)
+    this.setState({refreshing: !this.state.refreshing})
   },
   componentWillMount: function () {
     this.getData()
@@ -83,7 +72,7 @@ const BitcoinAppContainer = React.createClass({
       });
   },
   componentDidUpdate: function (prevProps, prevState) {
-    // console.log("updated!")
+    console.log("component updated! state:", prevState)
   },
   shouldComponentUpdate: function (nextProps, nextState) {
     return true
@@ -92,8 +81,14 @@ const BitcoinAppContainer = React.createClass({
     console.log(colourChanged + "" + priceChanged)
     return colourChanged || priceChanged
   },
-  getInitialState: function () {return {euroPrice: null, priceChange: "same", exchangeRates: []}}
-
+  getInitialState: function () {
+    return {
+      euroPrice: null,
+      priceChange: "same",
+      exchangeRates: [],
+      refreshing: true
+    }
+  }
 })
 
 
