@@ -1,94 +1,102 @@
 import React from 'react'
-import BitcoinExchangeRateContainer from './BitcoinExchangeRateContainer.jsx'
-import {calcPriceChange} from '../functions/bitcoinAppContainer.js'
+import ExchangeRates from './ExchangeRates.jsx'
+import {buildExchangeRateObject} from '../functions/dataFormatting.js'
+import {calcPriceChange} from '../functions/displayFormatting.js'
 
-const AppContainer = React.createClass({
+const BitcoinAppContainer = React.createClass({
   render: function () {
-    return (<div>
-      <BitcoinExchangeRateContainer
-        btcData={this.state.btcData}
-        exchangeRateData={this.state.exchangeRateData}
-        price={this.state.btcData.bpi.GBP.rate_float}
-        priceChange={this.state.priceChange}
-        toggleRefreshData={this.toggleRefreshData}
-        refreshing={this.state.refreshing}
-      />
-    </div>)
+    return (
+      <div>
+      <label htmlFor='refreshing'>Refreshing data: </label>
+      <input id='refreshing' type='checkbox' defaultChecked={true} onChange={this.toggleRefreshData}/>
+      <ExchangeRates priceChange={this.state.priceChange} btcPrices={buildExchangeRateObject(this.state.euroPrice, this.state.exchangeRates)}/>
+      </div>
+      )
   },
   toggleRefreshData: function (e) {
     setTimeout(() => {
-      if (this.state.refreshing) this.fetchData()
+      if (this.state.refreshing) this.getData()
     }, 0)
     this.setState({refreshing: !this.state.refreshing})
   },
   componentWillMount: function () {
-    this.fetchData()
-    setInterval(this.fetchData, 55000)
+    this.getData()
+    setInterval(this.getData, 10000)
   },
-  fetchData: function () {
+
+  getData: function () {
     if (!this.state.refreshing) return
     this.getDataLocalStorage();
     setTimeout(() => {
-      if (this.state.btcData == null) {
-        this.getBtcData()
-      }
-      if (this.state.exchangeRateData == null) {
-        this.getExchangeRateData()
+      if (this.state.euroPrice == null || this.state.exchangeRates.length === 0) {
+        this.fetchData()
       }
     }, 0)
   },
-  getBtcData: function () {
-    if (!this.state.refreshing) return
-    // if (localStorageDataNotOutOfDate) return
-    const request = new XMLHttpRequest
-    request.open('GET', 'http://api.coindesk.com/v1/bpi/currentprice.json')
-    request.onload = () => {
-      if (request.status >= 200 && request.status < 400){
-        const btcData = JSON.parse(request.responseText)
-        localStorage.setItem('btcData', JSON.stringify(btcData));
-        const gbpPrice = btcData.bpi.GBP.rate_float
-        console.log('price', gbpPrice, 'at', new Date(Date.now()))
-        const priceChange = calcPriceChange(this.state.price, gbpPrice)
-        this.setState({price: gbpPrice, priceChange: priceChange})
+  fetchData: function () {
+    const promises = []
+    promises.push(new Promise((resolve, reject) => {
+      const request = new XMLHttpRequest()
+      request.open('GET', 'http://api.coindesk.com/v1/bpi/currentprice.json')
+      request.onload = () => {
+        if (request.status >= 200 && request.status < 400){
+          const btcInfo = JSON.parse(request.responseText)
+          const euroPrice = btcInfo.bpi.EUR.rate_float
+          resolve(euroPrice)
+          // console.log("Price at", new Date(Date.now()), ":", euroPrice)
+          // const priceChange = calcPriceChange(this.state.euroPrice, euroPrice)
+          // this.setState({euroPrice, priceChange: priceChange})
+        }
+        else {
+          reject(request)
+        }
       }
-    }
-    request.send()
-  },
-  getExchangeRateData: function () {
-    if (!this.state.refreshing) return
-    // if (localStorageDataNotOutOfDate) return
-    const request = new XMLHttpRequest
-    request.open('GET', 'http://api.fixer.io/latest')
-    request.onload = () => {
-      if (request.status >= 200 && request.status < 400){
-        const exchangeRateData = JSON.parse(request.responseText)
-        localStorage.setItem('exchangeRateData', JSON.stringify(exchangeRateData));
+      request.send()
+    }))
+
+    promises.push(new Promise((resolve, reject) => {
+      const request = new XMLHttpRequest()
+      request.open('GET', 'http://api.fixer.io/latest')
+      request.onload = () => {
+        if (request.status >= 200 && request.status < 400){
+          const exchangeRateData = JSON.parse(request.responseText)
+          const rates = exchangeRateData.rates
+          console.log('exchange rates from EURO: ', rates)
+          resolve(rates)
+        }
       }
-    }
-    request.send()
+      request.send()
+    }))
+
+    Promise.all(promises)  
+      .then(([euroPrice, exchangeRates]) => {
+        console.log("PROMISES ALL BACK")
+        const priceChange = calcPriceChange(this.state.euroPrice, euroPrice)
+        this.setState({euroPrice, priceChange, exchangeRates})
+      })
+      .catch(function(err) {
+        console.log("Promise CATCH:", err);
+      });
   },
-  getDataLocalStorage: function () {
-    console.log((new Date("2016-10-20T22:46:00+00:00")).getTime())
-    console.log(Date.now())
-    const btcData = JSON.parse(localStorage.getItem('btcData'))
-    const exchangeRateData = JSON.parse(localStorage.getItem('exchangeRateData'))
-    this.toggleRefreshData()
-    this.setState({btcData, exchangeRateData, price: btcData.bpi.GBP.rate_float})
+  componentDidUpdate: function (prevProps, prevState) {
+    console.log("component updated! state:", prevState)
   },
   shouldComponentUpdate: function (nextProps, nextState) {
+    return true
     const colourChanged = this.state.priceChange != nextState.priceChange
     const priceChanged = this.state.price != nextState.price
     return colourChanged || priceChanged
   },
   getInitialState: function () {
     return {
-      refreshing: true,
-      btcData: null,
-      exchangeRateData: null,
-      price: null,
-      priceChange: 'same'
+      euroPrice: null,
+      priceChange: "same",
+      exchangeRates: [],
+      refreshing: true
     }
   }
 })
 
-export default AppContainer
+
+
+export default BitcoinAppContainer
