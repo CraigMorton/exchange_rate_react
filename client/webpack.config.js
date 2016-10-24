@@ -1,5 +1,5 @@
 config = {
-  entry: "./src/app.jsx",
+  entry: "./src/app.js",
   output: {
     filename: "bundle.js",
     path: "./build"

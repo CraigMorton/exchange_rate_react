@@ -1,7 +1,7 @@
 import React from 'react'
 import ExchangeRates from './ExchangeRates.jsx'
 import {buildExchangeRateObject} from '../functions/dataFormatting.js'
-import {calcPriceChange} from '../functions/displayFormatting.js'
+import {calcPriceChange} from '../functions/dataFormatting.js'
 
 const BitcoinAppContainer = React.createClass({
   render: function () {
@@ -21,9 +21,7 @@ const BitcoinAppContainer = React.createClass({
   },
   componentWillMount: function () {
     this.getData()
-    // this.getExchangeRateData()
     setInterval(this.getData, 10000)
-    // setInterval(this.getExchangeRateData, 10000)
   },
   getData: function () {
     const promises = []
@@ -72,7 +70,7 @@ const BitcoinAppContainer = React.createClass({
       });
   },
   componentDidUpdate: function (prevProps, prevState) {
-    console.log("component updated! state:", prevState)
+    console.log("component updated! prevState:", prevState)
   },
   shouldComponentUpdate: function (nextProps, nextState) {
     return true
