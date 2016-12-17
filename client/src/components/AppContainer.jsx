@@ -64,6 +64,9 @@ const BitcoinAppContainer = React.createClass({
           console.log('exchange rates from EURO: ', rates)
           resolve(rates)
         }
+        else {
+          reject(request)
+        }
       }
       request.send()
     }))
