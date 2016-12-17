@@ -1,13 +1,5 @@
 import {assert} from 'chai'
-import {formatCurrency, calcPriceChange} from '../src/functions/bitcoinAppContainer.js'
-
-describe('formatCurrency', () => {
-  it('should format for GBP', () => {
-    const gbpPrice = formatCurrency(1.23456, 'GBP')
-    assert.equal(gbpPrice, '£1.23')
-  })
-
-})
+import {calcPriceChange} from '../src/functions/dataFormatting.js'
 
 describe('calcPriceChange', () => {
   it('should identify matching prices', () => {
