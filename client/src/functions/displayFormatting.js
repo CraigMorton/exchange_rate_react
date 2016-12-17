@@ -1,5 +1,5 @@
 const formatCurrency = (price, currency) => {
-  if (price == null) return price;
+  if (price == null) return price
   const currencySettingLookup = {
     'EUR': ['en-eu', {style: 'currency', currency: 'EUR'}],
     'AUD': ['en-au', {style: 'currency', currency: 'AUD'}],
@@ -35,8 +35,8 @@ const formatCurrency = (price, currency) => {
     'ZAR': ['en-za', {style: 'currency', currency: 'ZAR'}]
   }
   if (currencySettingLookup[currency] != null && currencySettingLookup[currency].length > 0){
-    return price.toLocaleString(...(currencySettingLookup[currency]));
+    return price.toLocaleString(...(currencySettingLookup[currency]))
   }
-};
+}
 
 export {formatCurrency}

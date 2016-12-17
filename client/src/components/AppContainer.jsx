@@ -14,6 +14,7 @@ const BitcoinAppContainer = React.createClass({
       )
   },
   toggleRefreshData: function (e) {
+    console.log('checkbox value:', e.target.value)
     setTimeout(() => {
       if (this.state.refreshing) this.getData()
     }, 0)
@@ -26,7 +27,7 @@ const BitcoinAppContainer = React.createClass({
 
   getData: function () {
     if (!this.state.refreshing) return
-    this.getDataLocalStorage();
+    this.getDataLocalStorage()
     setTimeout(() => {
       if (this.state.euroPrice == null || this.state.exchangeRates.length === 0) {
         this.fetchData()
@@ -34,6 +35,7 @@ const BitcoinAppContainer = React.createClass({
     }, 0)
   },
   getDataLocalStorage: function () {
+    console.log('hitting localStorage')
     const btcInfo = JSON.parse(localStorage.getItem('btcData'))
     const exchangeRatesInfo = JSON.parse(localStorage.getItem('exchangeRateData'))
     const exchangeRates = exchangeRatesInfo.rates
@@ -51,7 +53,7 @@ const BitcoinAppContainer = React.createClass({
           const btcInfo = JSON.parse(request.responseText)
           const euroPrice = btcInfo.bpi.EUR.rate_float
           resolve(euroPrice)
-          // console.log("Price at", new Date(Date.now()), ":", euroPrice)
+          // console.log('Price at', new Date(Date.now()), ':', euroPrice)
           // const priceChange = calcPriceChange(this.state.euroPrice, euroPrice)
           // this.setState({euroPrice, priceChange: priceChange})
         }
@@ -81,19 +83,19 @@ const BitcoinAppContainer = React.createClass({
 
     Promise.all(promises)  
       .then(([euroPrice, exchangeRates]) => {
-        console.log("PROMISES ALL BACK")
+        console.log('PROMISES ALL BACK')
         const priceChange = calcPriceChange(this.state.euroPrice, euroPrice)
         this.setState({euroPrice, priceChange, exchangeRates})
       })
       .catch(function(err) {
-        console.log("Promise CATCH:", err);
-      });
+        console.log('Promise CATCH:', err)
+      })
   },
   componentDidUpdate: function (prevProps, prevState) {
-    console.log("component updated! prevState:", prevState)
+    console.log('component updated! prevState:', prevState)
   },
   shouldComponentUpdate: function (nextProps, nextState) {
-    return true
+    // return true
     const colourChanged = this.state.priceChange != nextState.priceChange
     const priceChanged = this.state.price != nextState.price
     return colourChanged || priceChanged
@@ -101,7 +103,7 @@ const BitcoinAppContainer = React.createClass({
   getInitialState: function () {
     return {
       euroPrice: null,
-      priceChange: "same",
+      priceChange: 'same',
       exchangeRates: [],
       refreshing: true
     }
