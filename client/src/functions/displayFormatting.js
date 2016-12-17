@@ -34,7 +34,7 @@ const formatCurrency = (price, currency) => {
     'USD': ['en-US', {style: 'currency', currency: 'USD'}],
     'ZAR': ['en-za', {style: 'currency', currency: 'ZAR'}]
   }
-  if (currencySettingLookup[currency] == null && currencySettingLookup[currency].length > 0){
+  if (currencySettingLookup[currency] != null && currencySettingLookup[currency].length > 0){
     return price.toLocaleString(...(currencySettingLookup[currency]));
   }
 };
