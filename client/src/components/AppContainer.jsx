@@ -33,6 +33,14 @@ const BitcoinAppContainer = React.createClass({
       }
     }, 0)
   },
+  getDataLocalStorage: function () {
+    const btcInfo = JSON.parse(localStorage.getItem('btcData'))
+    const exchangeRatesInfo = JSON.parse(localStorage.getItem('exchangeRateData'))
+    const exchangeRates = exchangeRatesInfo.rates
+    const euroPrice = btcInfo.bpi.EUR.rate_float
+    const priceChange = calcPriceChange(this.state.euroPrice, euroPrice)
+    this.setState({euroPrice, priceChange, exchangeRates})
+  },
   fetchData: function () {
     const promises = []
     promises.push(new Promise((resolve, reject) => {
