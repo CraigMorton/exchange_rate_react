@@ -2,13 +2,13 @@ import React from 'react'
 import ExchangeRates from './ExchangeRates.jsx'
 import {buildExchangeRateObject} from '../functions/dataFormatting.js'
 import {calcPriceChange} from '../functions/dataFormatting.js'
+import SettingsBox from './SettingsBox.jsx'
 
 const BitcoinAppContainer = React.createClass({
   render: function () {
     return (
       <div>
-      <label htmlFor='refreshing'>Refreshing data: </label>
-      <input id='refreshing' type='checkbox' defaultChecked={true} onChange={this.toggleRefreshData}/>
+      <SettingsBox toggleRefreshData={this.toggleRefreshData}/>
       <ExchangeRates priceChange={this.state.priceChange} btcPrices={buildExchangeRateObject(this.state.euroPrice, this.state.exchangeRates)}/>
       </div>
       )
