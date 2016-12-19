@@ -13,26 +13,73 @@ const BitcoinAppContainer = React.createClass({
       </div>
       )
   },
-  toggleRefreshData: function (e) {
-    console.log('checkbox value:', e.target.value)
-    setTimeout(() => {
-      if (this.state.refreshing) this.getData()
-    }, 0)
-    this.setState({refreshing: !this.state.refreshing})
+  componentDidUpdate: function (prevProps, prevState) {
+    console.log('component updated! prevState:', prevState)
+  },
+  shouldComponentUpdate: function (nextProps, nextState) {
+    // return true
+    const colourChanged = this.state.priceChange != nextState.priceChange
+    const priceChanged = this.state.price != nextState.price
+    return colourChanged || priceChanged
   },
   componentWillMount: function () {
+    this.startRefreshLoop()
+  },
+  getInitialState: function () {
+    return {
+      euroPrice: null,
+      priceChange: 'same',
+      exchangeRates: [],
+      refreshing: true
+    }
+  },
+  startRefreshLoop: function () {
     this.getData()
-    setInterval(this.getData, 10000)
+    const refreshLoopIntervalReference = setInterval(this.getData, 10000)
+    this.setState({refreshLoopIntervalReference})
+  },
+  stopRefreshLoop: function () {
+    clearInterval(this.state.refreshLoopIntervalReference)
+  },
+  shouldHitApi: function (refreshing) {
+    const browserOnline = (window.navigator.onLine)
+    // const browserOnline = (true) // TESTING ON A TRAIN
+    const userRequestingRefresh = (refreshing)
+    return (browserOnline && userRequestingRefresh) 
+  },
+  toggleRefreshData: function (e) {
+    console.log('refresh box checked?:', e.target.checked)
+    const newRefreshState = !this.state.refreshing
+    console.log('setting state to:', newRefreshState)
+    this.setState({refreshing: newRefreshState})
+    // setTimeout(() => {
+      // need to wrap in setTimeout-0 to allow getData method to use this.state.refreshing, not only shouldHitApi mathod
+      console.log('should hit API?', this.shouldHitApi(newRefreshState))
+      if (this.shouldHitApi(newRefreshState)) {
+        this.startRefreshLoop()
+      }
+      else {
+        this.stopRefreshLoop()
+      }
+    // }, 0)
   },
 
+    // is this.setState async? Why do I have to wrap in setTimeout(cb, 0) to keep state and checkbox in sync??
+    // should be fine if I set refreshing state value from e.target...
+    
+    // Seems pointless / wasteful to touch the DOM to get e.target.checked
+    // As I could simply use !this.state.refreshing - This is a toggle event listener.
   getData: function () {
-    if (!this.state.refreshing) return
-    this.getDataLocalStorage()
-    setTimeout(() => {
-      if (this.state.euroPrice == null || this.state.exchangeRates.length === 0) {
-        this.fetchData()
-      }
-    }, 0)
+    console.log(this.state.refreshing)
+    if (this.shouldHitApi(this.state.refreshing)) {
+      this.fetchData()
+    }
+    else {
+      this.getDataLocalStorage()
+    }
+  },
+  incompleteData: function () {
+    return (this.state.euroPrice == null || this.state.exchangeRates.length === 0)
   },
   getDataLocalStorage: function () {
     console.log('hitting localStorage')
@@ -90,23 +137,6 @@ const BitcoinAppContainer = React.createClass({
       .catch(function(err) {
         console.log('Promise CATCH:', err)
       })
-  },
-  componentDidUpdate: function (prevProps, prevState) {
-    console.log('component updated! prevState:', prevState)
-  },
-  shouldComponentUpdate: function (nextProps, nextState) {
-    // return true
-    const colourChanged = this.state.priceChange != nextState.priceChange
-    const priceChanged = this.state.price != nextState.price
-    return colourChanged || priceChanged
-  },
-  getInitialState: function () {
-    return {
-      euroPrice: null,
-      priceChange: 'same',
-      exchangeRates: [],
-      refreshing: true
-    }
   }
 })
 
