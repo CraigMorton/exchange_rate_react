@@ -6,9 +6,7 @@ const ExchangeRateDisplay = ({
   currency,
   change
 }) => (
-<div>
   <h3 className={'price-' + change}>{currency + ': ' + formatCurrency(value, currency)}</h3>
-</div>
 )
 
 export default ExchangeRateDisplay
