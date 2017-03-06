@@ -12,18 +12,14 @@ export {buildExchangeRateObject}
 const calcPriceChange = function (oldPrice, newPrice) {
   if (oldPrice == null) return 'same'
 
-  const same = () => (oldPrice === newPrice)
-  const greater = () => (oldPrice < newPrice)
-  const lower = () => (oldPrice > newPrice)
-
-  const equalityFunctions = {
-    same, greater, lower
+  const equalityStatus = {
+    same: oldPrice === newPrice,
+    greater: oldPrice < newPrice,
+    lower: oldPrice > newPrice
   }
-  for (let key in equalityFunctions) {
-    const equalityCaseFound = (equalityFunctions[key]())
-    if (equalityCaseFound) {
-      return key
-    }
+
+  for (let status in equalityStatus) {
+    if (equalityStatus[status]) return status
   }
   return null
 }
