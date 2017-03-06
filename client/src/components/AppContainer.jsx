@@ -17,9 +17,8 @@ const BitcoinAppContainer = React.createClass({
     console.log('component updated! prevState:', prevState)
   },
   shouldComponentUpdate: function (nextProps, nextState) {
-    // return true
     const colourChanged = this.state.priceChange != nextState.priceChange
-    const priceChanged = this.state.price != nextState.price
+    const priceChanged = this.state.euroPrice != nextState.euroPrice
     return colourChanged || priceChanged
   },
   componentWillMount: function () {
