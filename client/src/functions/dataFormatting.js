@@ -10,7 +10,7 @@ const buildExchangeRateObject = (euroBtcPrice, exchangeRates) => {
 export {buildExchangeRateObject}
 
 const calcPriceChange = function (oldPrice, newPrice) {
-  if (oldPrice == null) oldPrice = newPrice
+  if (oldPrice == null) return 'same'
 
   const same = () => (oldPrice === newPrice)
   const greater = () => (oldPrice < newPrice)
