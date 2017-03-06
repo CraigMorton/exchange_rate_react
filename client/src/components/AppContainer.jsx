@@ -14,7 +14,7 @@ const BitcoinAppContainer = React.createClass({
       )
   },
   componentDidUpdate: function (prevProps, prevState) {
-    console.log('component updated! prevState:', prevState)
+    console.log('componentDidUpdate called')
   },
   shouldComponentUpdate: function (nextProps, nextState) {
     const colourChanged = this.state.priceChange != nextState.priceChange
@@ -44,7 +44,7 @@ const BitcoinAppContainer = React.createClass({
     const browserOnline = (window.navigator.onLine)
     // const browserOnline = (true) // TESTING ON A TRAIN
     const userRequestingRefresh = (refreshing)
-    return (browserOnline && userRequestingRefresh) 
+    return (browserOnline && userRequestingRefresh)
   },
   toggleRefreshData: function (e) {
     console.log('refresh box checked?:', e.target.checked)
@@ -65,7 +65,7 @@ const BitcoinAppContainer = React.createClass({
 
     // is this.setState async? Why do I have to wrap in setTimeout(cb, 0) to keep state and checkbox in sync??
     // should be fine if I set refreshing state value from e.target...
-    
+
     // Seems pointless / wasteful to touch the DOM to get e.target.checked
     // As I could simply use !this.state.refreshing - This is a toggle event listener.
   getData: function () {
@@ -127,7 +127,7 @@ const BitcoinAppContainer = React.createClass({
       request.send()
     }))
 
-    Promise.all(promises)  
+    Promise.all(promises)
       .then(([euroPrice, exchangeRates]) => {
         console.log('PROMISES ALL BACK')
         const priceChange = calcPriceChange(this.state.euroPrice, euroPrice)

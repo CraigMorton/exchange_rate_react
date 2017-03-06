@@ -4,8 +4,8 @@ const SettingsBox = ({
 	toggleRefreshData
 }) => (
 	<div>
-	  <label htmlFor='refreshing'>Refreshing data: </label>
-	  <input id='refreshing' type='checkbox' defaultChecked={true} onChange={toggleRefreshData}/>
+    <label htmlFor='refreshing'>Refreshing data: </label>
+    <input id='refreshing' type='checkbox' defaultChecked={true} onChange={toggleRefreshData}/>
   </div>
 )
 
