@@ -13,9 +13,6 @@ const BitcoinAppContainer = React.createClass({
       </div>
       )
   },
-  componentDidUpdate: function (prevProps, prevState) {
-    console.log('componentDidUpdate called')
-  },
   shouldComponentUpdate: function (nextProps, nextState) {
     const colourChanged = this.state.priceChange != nextState.priceChange
     const priceChanged = this.state.euroPrice != nextState.euroPrice
@@ -32,8 +29,8 @@ const BitcoinAppContainer = React.createClass({
       refreshing: true
     }
   },
-  startRefreshLoop: function () {
-    this.getData()
+  startRefreshLoop: function (refreshing) {
+    this.getData(refreshing)
     const refreshLoopIntervalReference = setInterval(this.getData, 10000)
     this.setState({refreshLoopIntervalReference})
   },
@@ -41,36 +38,24 @@ const BitcoinAppContainer = React.createClass({
     clearInterval(this.state.refreshLoopIntervalReference)
   },
   shouldHitApi: function (refreshing) {
-    const browserOnline = (window.navigator.onLine)
-    // const browserOnline = (true) // TESTING ON A TRAIN
-    const userRequestingRefresh = (refreshing)
+    const browserOnline = window.navigator.onLine
+    const userRequestingRefresh = refreshing
     return (browserOnline && userRequestingRefresh)
   },
-  toggleRefreshData: function (e) {
-    console.log('refresh box checked?:', e.target.checked)
-    const newRefreshState = !this.state.refreshing
-    console.log('setting state to:', newRefreshState)
-    this.setState({refreshing: newRefreshState})
-    // setTimeout(() => {
-      // need to wrap in setTimeout-0 to allow getData method to use this.state.refreshing, not only shouldHitApi mathod
-      console.log('should hit API?', this.shouldHitApi(newRefreshState))
-      if (this.shouldHitApi(newRefreshState)) {
-        this.startRefreshLoop()
-      }
-      else {
-        this.stopRefreshLoop()
-      }
-    // }, 0)
+  toggleRefreshData: function () {
+    const refreshing = !this.state.refreshing
+    this.setState({refreshing})
+    if (this.shouldHitApi(refreshing)) {
+      this.startRefreshLoop(refreshing)
+    }
+    else {
+      this.stopRefreshLoop()
+    }
   },
-
-    // is this.setState async? Why do I have to wrap in setTimeout(cb, 0) to keep state and checkbox in sync??
-    // should be fine if I set refreshing state value from e.target...
-
-    // Seems pointless / wasteful to touch the DOM to get e.target.checked
-    // As I could simply use !this.state.refreshing - This is a toggle event listener.
-  getData: function () {
-    console.log(this.state.refreshing)
-    if (this.shouldHitApi(this.state.refreshing)) {
+  getData: function (refreshing) {
+    const refreshRecentlyRequested = this.shouldHitApi(refreshing)
+    const refreshingInState = this.shouldHitApi(this.state.refreshing)
+    if (refreshRecentlyRequested || refreshingInState) {
       this.fetchData()
     }
     else {
@@ -78,10 +63,9 @@ const BitcoinAppContainer = React.createClass({
     }
   },
   incompleteData: function () {
-    return (this.state.euroPrice == null || this.state.exchangeRates.length === 0)
+    return this.state.euroPrice == null || this.state.exchangeRates.length === 0
   },
   getDataLocalStorage: function () {
-    console.log('hitting localStorage')
     const btcInfo = JSON.parse(localStorage.getItem('btcData'))
     const exchangeRatesInfo = JSON.parse(localStorage.getItem('exchangeRateData'))
     const exchangeRates = exchangeRatesInfo.rates
@@ -99,9 +83,6 @@ const BitcoinAppContainer = React.createClass({
           const btcInfo = JSON.parse(request.responseText)
           const euroPrice = btcInfo.bpi.EUR.rate_float
           resolve(euroPrice)
-          // console.log('Price at', new Date(Date.now()), ':', euroPrice)
-          // const priceChange = calcPriceChange(this.state.euroPrice, euroPrice)
-          // this.setState({euroPrice, priceChange: priceChange})
         }
         else {
           reject(request)
@@ -116,9 +97,7 @@ const BitcoinAppContainer = React.createClass({
       request.onload = () => {
         if (request.status >= 200 && request.status < 400){
           const exchangeRateData = JSON.parse(request.responseText)
-          const rates = exchangeRateData.rates
-          console.log('exchange rates from EURO: ', rates)
-          resolve(rates)
+          resolve(exchangeRateData.rates)
         }
         else {
           reject(request)
@@ -129,12 +108,11 @@ const BitcoinAppContainer = React.createClass({
 
     Promise.all(promises)
       .then(([euroPrice, exchangeRates]) => {
-        console.log('PROMISES ALL BACK')
         const priceChange = calcPriceChange(this.state.euroPrice, euroPrice)
         this.setState({euroPrice, priceChange, exchangeRates})
       })
-      .catch(function(err) {
-        console.log('Promise CATCH:', err)
+      .catch(function(error) {
+        console.error(error)
       })
   }
 })
