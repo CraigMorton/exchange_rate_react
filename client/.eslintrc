@@ -17,6 +17,7 @@
             "never"
         ],
         "no-console": [2, {"allow": ["error"]} ],
+        "no-unused-expressions": [2, {"allowShortCircuit": true}],
         "react/react-in-jsx-scope": 2,
         "react/jsx-uses-react": 2,
         "react/jsx-uses-vars": 2
