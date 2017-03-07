@@ -16,8 +16,10 @@
             2,
             "never"
         ],
-        "react/react-in-jsx-scope": 1,
-        "react/jsx-uses-react": 1
+        "no-console": [2, {"allow": ["error"]} ],
+        "react/react-in-jsx-scope": 2,
+        "react/jsx-uses-react": 2,
+        "react/jsx-uses-vars": 2
     },
     "env": {
         "es6": true,
