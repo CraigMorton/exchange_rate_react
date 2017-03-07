@@ -11,7 +11,7 @@ const BitcoinAppContainer = React.createClass({
       <SettingsBox toggleRefreshData={this.toggleRefreshData}/>
       <ExchangeRates priceChange={this.state.priceChange} btcPrices={buildExchangeRateObject(this.state.euroPrice, this.state.exchangeRates)}/>
       </div>
-      )
+    )
   },
   shouldComponentUpdate: function (nextProps, nextState) {
     const colourChanged = this.state.priceChange != nextState.priceChange
